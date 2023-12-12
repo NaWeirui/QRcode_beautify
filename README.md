@@ -15,8 +15,8 @@ models: #关联模型
 #- damo/speech_charctc_kws_phone-xiaoyunxiaoyun
 
 ## 启动文件(若SDK为Gradio/Streamlit，默认为app.py, 若为Static HTML, 默认为index.html)
-# deployspec:
-#   entry_file: app.py
+deployspec:
+  entry_file: appBot.py
 license: Apache License 2.0
 ---
 #### Clone with HTTP
