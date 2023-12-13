@@ -9,4 +9,5 @@ params = {
 }
 result = QrcodeBeautify().__call__(**params)
 result.save('result.png')
+print("Finish")
 

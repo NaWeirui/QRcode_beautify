@@ -3,10 +3,10 @@ import time
 import json
 import pandas as pd
 import requests
+from io import BytesIO
 from modelscope_agent.tools.tool import Tool, ToolSchema
 from pydantic import ValidationError
 from requests.exceptions import RequestException, Timeout
-import httpx
 
 from modelscope import snapshot_download
 import torch
@@ -105,13 +105,14 @@ class QrcodeBeautify(Tool):
             "prompt" : prompt,
             "image_path": image_path
         }
-        response = httpx.post(url, json=data,timeout=60)
+        response = requests.post(url,json=data)
         if response.status_code == 200:
-            result = response.json()
+            # 将图像数据读取为 PIL 图像对象
+            result = Image.open(BytesIO(response.content))
+
             return result
-            # 在这里处理 result
         else:
-            print(f"Request failed with status code: {response.status_code}")
+            print(f"Request failed with status code: {response.status_code}\n{response}")
         
         # qrcode_image = Image.open(image_path)
         # negative_prompt = "ugly, disfigured, low quality, blurry, nsfw"
