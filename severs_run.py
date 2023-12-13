@@ -1,11 +1,12 @@
 from fastapi import FastAPI, HTTPException, File, UploadFile, Form
-from fastapi.responses import StreamingResponse
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import torch
 from io import BytesIO
 from typing import Optional
 from PIL import Image
 from modelscope import snapshot_download
+import tempfile
 from compel import Compel
 from diffusers import (
     StableDiffusionControlNetPipeline,
@@ -63,6 +64,7 @@ async def run_diffusion_control(request: DiffusionControlRequest):
         # 解析请求中的参数
         prompt = request.prompt
         image_path = request.image_path
+        print("Connected success")
         qrcode_image = Image.open(image_path)
         negative_prompt = "ugly, disfigured, low quality, blurry, nsfw"
         controlnet_path="nohide"
@@ -90,6 +92,9 @@ async def run_diffusion_control(request: DiffusionControlRequest):
         torch_dtype=torch.float32
         ).to('cpu')
         base_model = snapshot_download(Model_path_MAP[model],revision='v1.0.0')
+
+        # 设置要使用的 CUDA 设备
+        torch.cuda.set_device(1)
 
         pipe = StableDiffusionControlNetPipeline.from_pretrained(
             base_model,
@@ -129,8 +134,21 @@ async def run_diffusion_control(request: DiffusionControlRequest):
             controlnet_conditioning_scale=float(controlnet_conditioning_scale),
             num_inference_steps=int(num_inference_steps),
         )
+        
+         # Assuming out.images[0] is a PIL.Image.Image object
+        pil_image = out.images[0]
 
-        return {"images": out.images}
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as temp_file:
+            temp_file_path = temp_file.name
+            pil_image.save(temp_file_path)
+
+        # Return the image as a FileResponse
+        return FileResponse(temp_file_path, media_type="image/png", filename="result.png")
+
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+if __name__ == '__main__':
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000, timeout_keep_alive=60)
