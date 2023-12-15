@@ -1,11 +1,16 @@
 import random
 import sys
 import traceback
+import os
+import shutil
 
 import gradio as gr
-from config_utils import get_avatar_image, parse_configuration
+from config_utils import get_avatar_image, parse_configuration,get_ci_dir
 from gradio_utils import ChatBot, format_cover_html
 from user_core import init_user_chatbot_agent
+
+# import dashscope
+# dashscope.api_key="sk-5e565ab4807d49169127116d5dbd1a08"
 
 uuid_str = 'local_user'
 builder_cfg, model_cfg, tool_cfg, available_tool_list, _, _ = parse_configuration(
@@ -18,6 +23,13 @@ customTheme = gr.themes.Default(
     radius_size=gr.themes.utils.sizes.radius_none,
 )
 
+def check_uuid(uuid_str):
+    if not uuid_str or uuid_str == '':
+        if os.getenv('MODELSCOPE_ENVIRONMENT') == 'studio':
+            raise gr.Error('请登陆后使用! (Please login first)')
+        else:
+            uuid_str = 'local_user'
+    return uuid_str
 
 def init_user(state):
     try:
@@ -58,6 +70,11 @@ with demo:
                         container=False,
                         placeholder='跟我聊聊吧～')
                 with gr.Column(min_width=70, scale=1):
+                    upload_button = gr.UploadButton(
+                        '上传',
+                        file_types=['.png'],
+                        file_count='single')
+                with gr.Column(min_width=70, scale=1):
                     preview_send_button = gr.Button('发送', variant='primary')
 
         with gr.Column(scale=1):
@@ -67,6 +84,38 @@ with demo:
                 label='Prompt Suggestions',
                 examples=suggests,
                 inputs=[preview_chat_input])
+
+    def upload_file(chatbot, upload_button, _state):
+        _uuid_str = check_uuid(uuid_str)
+        new_file_paths = []
+        if 'file_paths' in _state:
+            file_paths = _state['file_paths']
+        else:
+            file_paths = []
+        for file in upload_button:
+            file_name = os.path.basename(file.name)
+            # covert xxx.json to xxx_uuid_str.json
+            file_name = file_name.replace('.', f'_{_uuid_str}.')
+            file_path = os.path.join(get_ci_dir(), file_name)
+            if not os.path.exists(file_path):
+                # make sure file path's directory exists
+                os.makedirs(os.path.dirname(file_path), exist_ok=True)
+                shutil.copy(file.name, file_path)
+                file_paths.append(file_path)
+            new_file_paths.append(file_path)
+            chatbot.append((None, f'上传文件{file_name}，成功'))
+        yield {
+            user_chatbot: gr.Chatbot.update(visible=True, value=chatbot),
+            preview_chat_input: gr.Textbox.update(value='')
+        }
+
+        _state['file_paths'] = file_paths
+        _state['new_file_paths'] = new_file_paths
+
+    upload_button.upload(
+        upload_file,
+        inputs=[user_chatbot, upload_button, state],
+        outputs=[user_chatbot, preview_chat_input])
 
     def send_message(chatbot, input, _state):
         # 将发送的消息添加到聊天历史
