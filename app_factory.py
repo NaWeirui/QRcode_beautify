@@ -1,8 +1,23 @@
+import ssl
+import nltk
+
 import os
 import zipfile
 import requests
 import subprocess
 from urllib.parse import urlparse, unquote
+
+
+# download nltk package with ssl
+try:
+    _create_unverified_https_context = ssl._create_unverified_context
+except AttributeError:
+    pass
+else:
+    ssl._create_default_https_context = _create_unverified_https_context
+
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
 
 def download_and_setup():
     # 获取URL
@@ -17,6 +32,9 @@ def download_and_setup():
     # 检查文件是否已存在，如果存在则删除
     if os.path.exists(file_path):
         os.remove(file_path)
+
+    # 删除原有配置信息,确保重新加载
+    os.remove("/tmp/agentfabric")
 
     # 下载文件
     response = requests.get(url)
