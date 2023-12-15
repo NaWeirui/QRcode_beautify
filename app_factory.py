@@ -1,6 +1,6 @@
 import ssl
 import nltk
-
+import shutil
 import os
 import zipfile
 import requests
@@ -34,8 +34,8 @@ def download_and_setup():
         os.remove(file_path)
 
     # 删除原有配置信息,确保重新加载
-    if os.path.exists("/tmp/agentfabric/local_user"):
-        os.remove("/tmp/agentfabric/local_user")
+    if os.path.exists("/tmp/agentfabric/config/local_user"):
+        shutil.rmtree("/tmp/agentfabric/config/local_user")
 
     # 下载文件
     response = requests.get(url)
