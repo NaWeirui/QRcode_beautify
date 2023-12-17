@@ -150,7 +150,7 @@ class QrcodeBeautify(Tool):
         else:
             # 请求失败
             print("Error:", response.status_code, response.text)
-
+            return {'result' : '无法连接到服务器，错误信息：' + response.status_code + response.text}
         
         # data = {
         #     "prompt" : prompt,
