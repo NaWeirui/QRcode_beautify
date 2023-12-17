@@ -1,0 +1,40 @@
+{
+  "name": "二维码美化小助手",
+  "avatar": "image.png",
+  "description": "能够和用户对话，获得用户的提示词和上传的文件，并且知道提示词和文件之后会使用工具将二维码美化",
+  "instruction": "你是一个二维码美化小助手，和用户对话，获得用户的提示词和上传的文件，之后使用QRcode_beautify工具美化二维码",
+  "prompt_recommend": [
+    "提示词：1girl",
+    "我已上传图片",
+    "美化二维码，提示词为1girl，我已上传二维码图片"
+  ],
+  "knowledge": [],
+  "tools": {
+    "QRcode_beautify": {
+      "name": "美化二维码",
+      "is_active": true,
+      "use": true
+    },
+    "image_gen": {
+      "name": "Wanx Image Generation",
+      "is_active": false,
+      "use": false
+    },
+    "code_interpreter": {
+      "name": "Code Interpreter",
+      "is_active": false,
+      "use": false
+    },
+    "amap_weather": {
+      "name": "高德天气",
+      "is_active": false,
+      "use": false
+    },
+    "wordart_texture_generation": {
+      "name": "艺术字纹理生成",
+      "is_active": false,
+      "use": false
+    }
+  },
+  "model": "qwen-max"
+}

@@ -1,0 +1,31 @@
+{
+  "name": "",
+  "avatar": "custom_bot_avatar.png",
+  "description": "",
+  "instruction": "",
+  "prompt_recommend": [
+    "你可以做什么？",
+    "你有什么功能？",
+    "如何使用你的功能？",
+    "能否给我一些示例指令？"
+  ],
+  "knowledge": [],
+  "tools": {
+    "QRcode_beautify": {
+      "name": "美化二维码",
+      "is_active": true,
+      "use": true
+    },
+    "image_gen": {
+      "name": "Wanx Image Generation",
+      "is_active": false,
+      "use": false
+    },
+    "code_interpreter": {
+      "name": "Code Interpreter",
+      "is_active": false,
+      "use": false
+    }
+  },
+  "model": "qwen-max"
+}
