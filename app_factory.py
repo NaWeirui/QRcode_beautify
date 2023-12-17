@@ -104,6 +104,8 @@ with demo:
         #         file_path.append(file_path)
         #     chatbot.append((None, f'上传文件{file_name}，成功'))
         chatbot.append(((file.name,), f'上传文件，成功'))
+        # chatbot.append(((None,), f'上传文件，成功'))
+        print("file.name:", file.name)
         yield {
             user_chatbot: gr.Chatbot.update(visible=True, value=chatbot),
             preview_chat_input: gr.Textbox.update(value='')
@@ -137,9 +139,12 @@ with demo:
                 # action_exec_result
                 if isinstance(exec_result, dict):
                     exec_result = str(exec_result['result'])
-                    path = exec_result
-                frame_text = f'<result>执行完成</result>'
-                generate = True
+                    if exec_result.startswith('无法连接到服务器'):
+                        frame_text = f'<result>{exec_result}</result>'
+                    else:
+                        frame_text = f'<result>执行完成</result>'
+                        path = exec_result
+                        generate = True
             else:
                 # llm result
                 frame_text = llm_result
@@ -167,4 +172,4 @@ with demo:
     
 
 demo.queue()
-demo.launch(share=True)
+demo.launch()
