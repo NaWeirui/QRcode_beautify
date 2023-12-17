@@ -12,9 +12,9 @@ from modelscope import snapshot_download
 import torch
 from PIL import Image
 import io
-import qrcode
+# import qrcode
 from requests import get
-from compel import Compel
+# from compel import Compel
 import numpy as np
 
 import requests
@@ -141,7 +141,8 @@ class QrcodeBeautify(Tool):
             # with open("/home/wsco/zcg/project/qrcode_beautify_2.0/facechain_agent/temp/"+filename, "wb") as file:
             #     file.write(response.content)    
             print(f"File '{filename}' received successfully.")
-            delete_path = "/home/wsco/zcg/project/qrcode/temp/delete.png"
+            # delete_path = "/home/wsco/zcg/project/qrcode/temp/delete.png"
+            delete_path = os.getenv("DELETEPATH", "/temp/image/delete.png")
             delete_path = delete_path.replace('.', str(np.random.randint(1,999)) + '.')
             Image.open(BytesIO(response.content)).save(delete_path)
             # return {'result' : f'![]({delete_path})'}
