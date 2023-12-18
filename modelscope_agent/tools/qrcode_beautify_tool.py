@@ -65,7 +65,8 @@ SAMPLER_MAP = {
     "DEIS": lambda config: DEISMultistepScheduler.from_config(config),
 }
 
-os.environ.get('QRCODEAPI_URL', '')
+# url = os.environ.get('QRCODEAPI_URL', '')
+url = "https://prime-just-monkey.ngrok-free.app/run_diffusion_control"
 
 class QrcodeBeautify(Tool):    
     description = 'QRcode是一个美化二维码的工具，输入用户上传二维码并输入要求，生成美化后的二维码。'
@@ -142,7 +143,7 @@ class QrcodeBeautify(Tool):
             #     file.write(response.content)    
             print(f"File '{filename}' received successfully.")
             # delete_path = "/home/wsco/zcg/project/qrcode/temp/delete.png"
-            delete_path = os.getenv("DELETEPATH", "/temp/image/delete.png")
+            delete_path = os.getenv("DELETEPATH", "/home/wsco/zcg/project/qrcode_beautify/temp/delete.png")
             delete_path = delete_path.replace('.', str(np.random.randint(1,999)) + '.')
             Image.open(BytesIO(response.content)).save(delete_path)
             # return {'result' : f'![]({delete_path})'}
@@ -150,7 +151,7 @@ class QrcodeBeautify(Tool):
         else:
             # 请求失败
             print("Error:", response.status_code, response.text)
-            return {'result' : '无法连接到服务器，错误信息：' + response.status_code + response.text}
+            return {'result' : '无法连接到服务器，错误信息：' + str(response.status_code) + response.text}
         
         # data = {
         #     "prompt" : prompt,
